@@ -45,6 +45,7 @@ volatility forecasting in market risk management.
 | `garch_calculator_data.py` | Loads real data by ticker (via yfinance) or CSV, fits GARCH(1,1), and compares simple vs. GARCH VaR |
 | `garch_general_calculator.py` | Generalized GARCH(p,q) for arbitrary lag orders — see [README_general.md](README_general.md) |
 | `gjr_garch_calculator.py` | GJR-GARCH(1,1) with asymmetric leverage effect — see [README_gjr.md](README_gjr.md) |
+| `egarch_calculator.py` | EGARCH(1,1), log-variance based asymmetric model — see [README_egarch.md](README_egarch.md) |
 
 ## Usage
 
