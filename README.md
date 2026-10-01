@@ -43,6 +43,7 @@ volatility forecasting in market risk management.
 |---|---|
 | `garch_calculator.py` | Core GARCH(1,1) functions (`fit_garch`, `garch_volatility`, `garch_var`) — demo runs on synthetic data |
 | `garch_calculator_data.py` | Loads real data by ticker (via yfinance) or CSV, fits GARCH(1,1), and compares simple vs. GARCH VaR |
+| `garch_general_calculator.py` | Generalized GARCH(p,q) for arbitrary lag orders — see [README_general.md](README_general.md) |
 
 ## Usage
 
