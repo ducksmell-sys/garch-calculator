@@ -2,6 +2,7 @@
 (negative shocks increase volatility more than positive shocks of the same size).
 """
 
+import matplotlib.pyplot as plt
 import numpy as np
 from scipy.optimize import minimize
 
@@ -95,6 +96,35 @@ def gjr_var(returns, confidence=0.95, portfolio_value=1.0, params=None):
     return z * sigma * portfolio_value
 
 
+def plot_news_impact_curve(gjr_params, garch_params, sigma2_prev, out_path="gjr_news_impact_curve.png"):
+    """뉴스 충격 곡선: 어제의 충격 크기(가로축)에 따른 내일의 변동성(세로축).
+
+    어제까지의 변동성(sigma2_prev)을 고정하고 충격만 바꿔가며 두 모델을 비교한다.
+    """
+    shocks = np.linspace(-0.06, 0.06, 241)
+    garch_vol = np.sqrt(
+        garch_params["omega"] + garch_params["alpha"] * shocks**2 + garch_params["beta"] * sigma2_prev
+    )
+    indicator = (shocks < 0).astype(float)
+    gjr_vol = np.sqrt(
+        gjr_params["omega"]
+        + (gjr_params["alpha"] + gjr_params["gamma"] * indicator) * shocks**2
+        + gjr_params["beta"] * sigma2_prev
+    )
+
+    fig, ax = plt.subplots(figsize=(9, 5))
+    ax.plot(shocks * 100, garch_vol * 100, color="#4C72B0", linewidth=2, label="GARCH(1,1): symmetric")
+    ax.plot(shocks * 100, gjr_vol * 100, color="#C44E52", linewidth=2, label="GJR-GARCH: asymmetric")
+    ax.axvline(0, color="gray", linewidth=0.8)
+    ax.set_xlabel("Yesterday's return shock (%)")
+    ax.set_ylabel("Next-day volatility forecast (%)")
+    ax.set_title("News Impact Curve: Down Shocks Raise Volatility More Than Up Shocks")
+    ax.legend(loc="upper center")
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=150)
+    print(f"[안내] 차트를 '{out_path}'에 저장했습니다.")
+
+
 if __name__ == "__main__":
     # 비대칭성이 내재된 가짜 데이터 생성: 하락일 다음날 변동성이 더 크게 반응하도록 설계
     rng = np.random.default_rng(7)
@@ -136,3 +166,8 @@ if __name__ == "__main__":
         f"{'GJR-GARCH':<12} {gjr_vol_up:<20.4%} {gjr_vol_down:<20.4%} "
         f"{(gjr_vol_down - gjr_vol_up) * 100:.2f}%p (하락이 변동성을 더 키움)"
     )
+
+    sigma2_prev = _variance_path(
+        returns, gjr_params["omega"], gjr_params["alpha"], gjr_params["gamma"], gjr_params["beta"]
+    )[-1]
+    plot_news_impact_curve(gjr_params, garch_params, sigma2_prev)

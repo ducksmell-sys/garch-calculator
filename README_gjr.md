@@ -73,3 +73,9 @@ the leverage effect built into the simulated data.
 ![Up vs down shock response across GARCH, GJR-GARCH and EGARCH](asymmetry_comparison.png)
 
 GARCH(1,1) gives identical forecasts after a +3% and a -3% shock; GJR-GARCH separates them, and EGARCH separates them even more.
+
+### News impact curve
+
+![News impact curve: GARCH(1,1) vs GJR-GARCH](gjr_news_impact_curve.png)
+
+This is the standard way to visualize asymmetric volatility. Holding yesterday's variance fixed, it plots tomorrow's forecasted volatility against the size of yesterday's shock. GARCH(1,1) (blue) is a symmetric parabola, so a -6% and a +6% day produce the same forecast. GJR-GARCH (red) is steeper on the left: the same -6% shock pushes forecasted volatility to about 2.1%, versus about 1.7% after a +6% shock.
