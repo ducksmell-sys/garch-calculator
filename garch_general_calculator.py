@@ -5,6 +5,7 @@ to arbitrary (p, q) orders, letting the model look back further in time for the 
 (shock) and GARCH (variance) terms.
 """
 
+import matplotlib.pyplot as plt
 import numpy as np
 from scipy.optimize import minimize
 
@@ -97,6 +98,24 @@ def long_run_variance(params):
     return params["omega"] / (1 - persistence)
 
 
+def plot_order_comparison(labels, persistences, long_run_vols, out_path="garch_order_comparison.png"):
+    """차수(p,q)별 잔류율과 장기평균 변동성을 비교 (과적합 불안정성 시각화)."""
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 5))
+    ax1.bar(labels, persistences, color="#4C72B0")
+    ax1.axhline(1.0, color="black", linestyle="--", linewidth=1.5, label="Stationarity limit (=1)")
+    ax1.set_ylim(0.9, 1.01)
+    ax1.set_title("Persistence (sum of alphas + betas)")
+    ax1.legend()
+
+    ax2.bar(labels, [v * 100 for v in long_run_vols], color="#C44E52")
+    ax2.set_yscale("log")
+    ax2.set_title("Implied Long-Run Volatility (%, log scale)")
+    fig.suptitle("Higher-Order GARCH Becomes Unstable on Limited Data")
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=150)
+    print(f"[안내] 차트를 '{out_path}'에 저장했습니다.")
+
+
 if __name__ == "__main__":
     # 예시: 평온한 구간(150일) 이후 변동성이 급등하는 구간(15일)이 이어지는 가짜 데이터
     calm = np.random.default_rng(1).normal(0, 0.005, 150)
@@ -105,6 +124,7 @@ if __name__ == "__main__":
     portfolio_value = 1_000_000
 
     print(f"{'모형':<12} {'잔류율(Σα+Σβ)':<16} {'다음날 변동성':<14} {'장기평균 변동성':<16} {'VaR(95%)'}")
+    labels, persistences, long_run_vols = [], [], []
     for p, q in [(1, 1), (2, 1), (1, 2), (2, 2)]:
         params = fit_garch(sample_returns, p=p, q=q)
         vol = garch_volatility(sample_returns, params, p=p, q=q)
@@ -114,3 +134,8 @@ if __name__ == "__main__":
         print(
             f"GARCH({p},{q})  {persistence:<16.4f} {vol:<14.4%} {lr_vol:<16.4%} {var_95:,.2f}"
         )
+        labels.append(f"GARCH({p},{q})")
+        persistences.append(persistence)
+        long_run_vols.append(lr_vol)
+
+    plot_order_comparison(labels, persistences, long_run_vols)

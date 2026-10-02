@@ -40,7 +40,7 @@ than real explanatory power.
 ## Usage
 
 ```bash
-pip install numpy scipy
+pip install numpy scipy matplotlib
 python garch_general_calculator.py
 ```
 
@@ -71,3 +71,7 @@ Notice what happens as more lags are added: the persistence (`Σα + Σβ`) cree
 versus the ~1–2% that's actually plausible for this data). This is the overfitting
 instability higher-order GARCH models are prone to with limited sample sizes — exactly
 why GARCH(1,1) remains the industry default rather than a simplification of convenience.
+
+![Persistence and implied long-run volatility by model order](garch_order_comparison.png)
+
+Left: persistence (sum of alphas and betas) creeps up to the stationarity limit of 1 as lags are added. Right (log scale): the implied long-run volatility explodes for the higher-order fits, from about 1.9% for GARCH(1,1) to roughly 68% for GARCH(2,2).

@@ -45,7 +45,7 @@ interpretation as a positive `γ` in GJR-GARCH.
 ## Usage
 
 ```bash
-pip install numpy scipy
+pip install numpy scipy matplotlib
 python egarch_calculator.py
 ```
 
@@ -76,3 +76,7 @@ All three models agree on the direction (down-shocks → higher forecasted volat
 but EGARCH's smooth, continuous asymmetry term produces the most pronounced spread
 between the two scenarios in this data — illustrating that GJR-GARCH and EGARCH, while
 solving the same problem, don't always agree on *how much* asymmetry is present.
+
+![Up vs down shock response across GARCH, GJR-GARCH and EGARCH](asymmetry_comparison.png)
+
+The same comparison as a chart: the red (down-shock) bar sits above the blue (up-shock) bar for both asymmetric models, and the gap is widest for EGARCH.

@@ -1,5 +1,6 @@
 """GARCH(1,1) volatility & VaR calculator: parameters estimated by maximum likelihood (MLE)."""
 
+import matplotlib.pyplot as plt
 import numpy as np
 from scipy.optimize import minimize
 
@@ -70,6 +71,28 @@ def garch_var(returns, confidence=0.95, portfolio_value=1.0, params=None):
     return z * sigma * portfolio_value
 
 
+def plot_garch_vs_simple(returns, params, out_path="garch_volatility.png"):
+    """GARCH(1,1) 조건부 변동성 경로(선) vs 전체기간 단순 표준편차(수평선)를 비교."""
+    returns = np.asarray(returns)
+    sigma = np.sqrt(_variance_path(returns, params["omega"], params["alpha"], params["beta"]))
+    simple_std = returns.std(ddof=1)
+
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 7), sharex=True, gridspec_kw={"height_ratios": [1, 2]})
+    ax1.plot(returns, color="gray", linewidth=0.8)
+    ax1.set_ylabel("Daily Return")
+    ax1.set_title("GARCH(1,1) Conditional Volatility Tracks Volatility Clustering")
+
+    ax2.plot(sigma, color="#C44E52", linewidth=1.8, label="GARCH(1,1) conditional volatility")
+    ax2.axhline(simple_std, color="#4C72B0", linestyle="--", linewidth=2,
+                label=f"Simple std dev (whole period) = {simple_std:.2%}")
+    ax2.set_xlabel("Day")
+    ax2.set_ylabel("Daily Volatility")
+    ax2.legend()
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=150)
+    print(f"[안내] 차트를 '{out_path}'에 저장했습니다.")
+
+
 if __name__ == "__main__":
     # 예시: 평온한 구간(100일) 이후 변동성이 급등하는 구간(10일)이 이어지는 가짜 데이터
     calm = np.random.default_rng(1).normal(0, 0.005, 100)   # 평상시: 변동성 0.5%
@@ -95,3 +118,5 @@ if __name__ == "__main__":
             f"신뢰수준 {confidence:.0%} | 단순 VaR: {simple_var:,.2f} | "
             f"GARCH VaR: {g_var:,.2f}"
         )
+
+    plot_garch_vs_simple(sample_returns, params)

@@ -5,6 +5,7 @@ needed on the parameters, and captures the leverage effect through a term that
 responds smoothly to the sign of the shock (rather than GJR-GARCH's on/off indicator).
 """
 
+import matplotlib.pyplot as plt
 import numpy as np
 from scipy.optimize import minimize
 
@@ -102,6 +103,28 @@ def egarch_var(returns, confidence=0.95, portfolio_value=1.0, params=None):
     return z * sigma * portfolio_value
 
 
+def plot_asymmetry(results, shock_size, out_path="asymmetry_comparison.png"):
+    """같은 크기의 상승/하락 충격 후 변동성 예측을 모델별로 막대그래프로 비교."""
+    names = list(results)
+    ups = [results[n][0] * 100 for n in names]
+    downs = [results[n][1] * 100 for n in names]
+    x = np.arange(len(names))
+    width = 0.35
+
+    fig, ax = plt.subplots(figsize=(9, 5))
+    ax.bar(x - width / 2, ups, width, color="#4C72B0", label=f"After +{shock_size:.0%} shock")
+    ax.bar(x + width / 2, downs, width, color="#C44E52", label=f"After -{shock_size:.0%} shock")
+    ax.set_xticks(x)
+    ax.set_xticklabels(names)
+    ax.set_ylabel("Next-day volatility forecast (%)")
+    ax.set_title("Leverage Effect: Same-Size Up vs Down Shock, Different Volatility Response")
+    ax.set_ylim(0, max(downs + ups) * 1.25)
+    ax.legend(loc="upper left")
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=150)
+    print(f"[안내] 차트를 '{out_path}'에 저장했습니다.")
+
+
 if __name__ == "__main__":
     # GJR-GARCH 데모와 동일한 방식: 비대칭성이 내재된 가짜 데이터 생성
     rng = np.random.default_rng(7)
@@ -148,3 +171,5 @@ if __name__ == "__main__":
     for name, (vol_up, vol_down) in results.items():
         diff = (vol_down - vol_up) * 100
         print(f"{name:<12} {vol_up:<20.4%} {vol_down:<20.4%} {diff:+.2f}")
+
+    plot_asymmetry(results, shock_size)

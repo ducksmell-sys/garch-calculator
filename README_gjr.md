@@ -39,7 +39,7 @@ Stationarity condition (under the normal-innovations assumption, where `E[I]=0.5
 ## Usage
 
 ```bash
-pip install numpy scipy
+pip install numpy scipy matplotlib
 python gjr_garch_calculator.py
 ```
 
@@ -69,3 +69,7 @@ GJR-GARCH    1.4180%              1.5687%              0.15%p (down day pushes v
 GARCH(1,1) is blind to the sign of the shock — identical forecasts either way. GJR-GARCH
 correctly produces a higher volatility forecast after the down day, exactly reproducing
 the leverage effect built into the simulated data.
+
+![Up vs down shock response across GARCH, GJR-GARCH and EGARCH](asymmetry_comparison.png)
+
+GARCH(1,1) gives identical forecasts after a +3% and a -3% shock; GJR-GARCH separates them, and EGARCH separates them even more.

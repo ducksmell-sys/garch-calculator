@@ -50,7 +50,7 @@ volatility forecasting in market risk management.
 ## Usage
 
 ```bash
-pip install numpy pandas scipy yfinance
+pip install numpy pandas scipy yfinance matplotlib
 
 # Run the core module on synthetic demo data (calm period + volatility shock)
 python garch_calculator.py
@@ -109,3 +109,7 @@ Simple std dev: 1.8148% | GARCH(1,1) next-day forecasted volatility: 1.4123%
 Typical equity GARCH(1,1) fits land around α ≈ 0.05–0.10 and β ≈ 0.85–0.90, with
 α + β close to (but below) 1 — indicating volatility shocks are highly persistent but
 still mean-reverting in the long run.
+
+![GARCH(1,1) conditional volatility vs simple standard deviation](garch_volatility.png)
+
+The top panel shows the simulated returns (100 calm days, then a 10-day shock). The bottom panel shows the GARCH(1,1) conditional volatility: it stays low during the calm period, spikes sharply as the shock arrives, and decays afterward, while the simple standard deviation is a single flat line that misses all of this.
